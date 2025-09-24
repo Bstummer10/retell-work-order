@@ -1,0 +1,28 @@
+export default async function handler(req, res) {
+  // Get the arguments the Retell AI collected from the incoming request
+  const { name, unit, description, permission, phone } = req.body.arguments;
+
+  // The webhook URL for Make.com
+  const makeWebhookURL = 'https://hook.us2.make.com/61g1iffqbjqvan8ghggmc3myoggyl8cn';
+
+  try {
+    // Send the collected data to the Make.com webhook
+    await fetch(makeWebhookURL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, unit, description, permission, phone }),
+    });
+
+    // Send a success response back to Retell
+    res.status(200).json({
+      content: "Okay, I've successfully submitted your work order for you."
+    });
+
+  } catch (error) {
+    console.error('Error forwarding to Make.com:', error);
+    // Send an error response back to Retell
+    res.status(500).json({
+      content: "I'm sorry, I encountered a technical problem and couldn't submit your request."
+    });
+  }
+}
